@@ -5,7 +5,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 import time
-import winsound
 from decouple import config
 
 driver = webdriver.Chrome('..\..\Downloads\chromedriver_win32\chromedriver')

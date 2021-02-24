@@ -8,7 +8,6 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import ElementNotInteractableException
 import time
-import winsound
 from decouple import config
 
 driver = webdriver.Chrome('..\..\Downloads\chromedriver_win32\chromedriver')
