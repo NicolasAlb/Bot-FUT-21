@@ -4,10 +4,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import ElementNotInteractableException
 import time
 from decouple import config
 
-driver = webdriver.Chrome('..\..\Downloads\chromedriver_win32\chromedriver')
+driver = webdriver.Chrome('chromedriver')
 driver.get("https://www.ea.com/fr-fr/fifa/ultimate-team/web-app/")
 
 # LOGIN
@@ -77,14 +80,22 @@ while 42:
                         print("Timeout Exception")
                         break
                 # time.sleep(1)
+                price = driver.find_element_by_xpath("/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/div/input").get_attribute('value')
+                price = price.replace("\u202f", "")
+                if int(price) <= int(config("CONSO_PRICE_BUY_MC_MOC")):
+                    try:
+                        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/button[1]")))
+                    except TimeoutException:
+                        print("Timeout Exception")
+                        break
                 element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, "/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/button[1]")))
                 element.click()
                 p = p + 1
-        if p == 20:
+        if p == 30:
             break
     element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/section/section/div[2]/div/div/section[1]/div/div/button[2]')))
     element.click()
-    if p == 20:
+    if p == 30:
         WebDriverWait(driver, 40).until(EC.invisibility_of_element_located((By.XPATH, '/html/body/div[4]')))
         time.sleep(1)
         element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/section/section/div[1]/button[1]')))

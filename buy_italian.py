@@ -10,7 +10,7 @@ from selenium.common.exceptions import ElementNotInteractableException
 import time
 from decouple import config
 
-driver = webdriver.Chrome('..\..\Downloads\chromedriver_win32\chromedriver')
+driver = webdriver.Chrome('chromedriver')
 driver.get("https://www.ea.com/fr-fr/fifa/ultimate-team/web-app/")
 
 # LOGIN
@@ -140,7 +140,7 @@ while 42:
                     # Increment by one the number of offers
                     p = p + 1
         # If the number of offers is equal to the number we want to stop buying (maximum 50 offers)
-        if p == 10:
+        if p == 30:
             break
     
     # Go to next page if the for loop end
@@ -148,7 +148,7 @@ while 42:
     element.click()
 
     # If the number of offers is equal to the number we want to stop buying, let's sell our players
-    if p == 10:
+    if p == 30:
 
         # Check if loader is invisible
         WebDriverWait(driver, 40).until(EC.invisibility_of_element_located((By.XPATH, '/html/body/div[4]')))
@@ -286,5 +286,3 @@ while 42:
         # Search again
         element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/section/section/div[2]/div/div[2]/div/div[2]/button[2]')))
         element.click()
-
-

@@ -7,7 +7,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 from decouple import config
 
-driver = webdriver.Chrome('..\..\Downloads\chromedriver_win32\chromedriver')
+driver = webdriver.Chrome('chromedriver')
 driver.get("https://www.ea.com/fr-fr/fifa/ultimate-team/web-app/")
 
 # LOGIN
