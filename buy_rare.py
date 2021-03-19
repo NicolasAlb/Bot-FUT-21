@@ -5,10 +5,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 import time
-import winsound
 from decouple import config
 
-driver = webdriver.Chrome('..\..\Downloads\chromedriver_win32\chromedriver')
+driver = webdriver.Chrome('chromedriver')
 driver.get("https://www.ea.com/fr-fr/fifa/ultimate-team/web-app/")
 
 # LOGIN

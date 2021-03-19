@@ -4,11 +4,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import ElementNotInteractableException
 import time
-import winsound
 from decouple import config
 
-driver = webdriver.Chrome('..\..\Downloads\chromedriver_win32\chromedriver')
+driver = webdriver.Chrome('chromedriver')
 driver.get("https://www.ea.com/fr-fr/fifa/ultimate-team/web-app/")
 
 # LOGIN
@@ -47,45 +49,52 @@ p = 0
 while 42:    
 
     # SEARCH RESULTS
-     time.sleep(2)
+    time.sleep(2)
     for i in range(20):
         time.sleep(1)
         element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, "/html/body/main/section/section/div[2]/div/div/section[1]/div/ul/li[" + str(i + 1) + "]")))
         element.click()
-        if driver.find_element_by_xpath("/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/div/input").is_enabled() and driver.find_elements(By.XPATH, "/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/div/input"):
+        try:
+            WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, '/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/div/input')))
+        except TimeoutException:
+            print("Timeout Exception")
+            break
+        if driver.find_elements(By.XPATH, "/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/div/input") and driver.find_element_by_xpath("/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/div/input").is_enabled():
             price = driver.find_element_by_xpath("/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/div/input").get_attribute('value')
             price = price.replace("\u202f", "")
-            print(price)
             if int(price) <= int(config("COMMON_PRICE_BUY")):
                 element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/div/input')))
                 element.click()
                 time.sleep(1)
                 buy_price = driver.find_element_by_xpath("/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/div/input")
-                buy_price.send_keys(config("COMMON_PRICE_BUY"))
+                try:
+                    buy_price.send_keys(config("COMMON_PRICE_BUY"))
+                except ElementNotInteractableException:
+                    break
                 time.sleep(1)
                 price = driver.find_element_by_xpath("/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/div/input").get_attribute('value')
                 price = price.replace("\u202f", "")
                 if int(price) <= int(config("COMMON_PRICE_BUY")):
                     try:
-                        WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, "/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/button[1]")))
+                        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/button[1]")))
                     except TimeoutException:
                         print("Timeout Exception")
-                        p = 20
                         break
-                    element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, "/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/button[1]")))
-                    element.click()
-                    p = p + 1
-        if p == 20:
+                element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, "/html/body/main/section/section/div[2]/div/div/section[2]/div/div/div[2]/div[2]/button[1]")))
+                element.click()
+                p = p + 1
+        if p == 30:
             break
     element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/section/section/div[2]/div/div/section[1]/div/div/button[2]')))
     element.click()
-    if p == 20:
+    if p == 30:
         WebDriverWait(driver, 40).until(EC.invisibility_of_element_located((By.XPATH, '/html/body/div[4]')))
         time.sleep(1)
         element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/section/section/div[1]/button[1]')))
         element.click()
         WebDriverWait(driver, 40).until(EC.invisibility_of_element_located((By.XPATH, '/html/body/div[4]')))
         time.sleep(1)
+        WebDriverWait(driver, 40).until(EC.invisibility_of_element_located((By.XPATH, '/html/body/div[4]')))
         element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/section/section/div[1]/button[1]')))
         element.click()
         WebDriverWait(driver, 40).until(EC.invisibility_of_element_located((By.XPATH, '/html/body/div[4]')))
@@ -101,6 +110,13 @@ while 42:
         WebDriverWait(driver, 40).until(EC.invisibility_of_element_located((By.XPATH, '/html/body/div[4]')))
         while driver.find_elements(By.XPATH, "/html/body/main/section/section/div[2]/div/div/div/section[3]/ul/li[1]"):
             WebDriverWait(driver, 40).until(EC.invisibility_of_element_located((By.XPATH, '/html/body/div[4]')))
+            while 42:
+                try:
+                    WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/section/section/div[2]/div/div/div/section[3]/ul/li[1]')))
+                except StaleElementReferenceException:
+                    print("Stale Exception")
+                    continue
+                break
             element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/section/section/div[2]/div/div/div/section[3]/ul/li[1]')))
             element.click()
             time.sleep(1)
@@ -134,6 +150,13 @@ while 42:
         WebDriverWait(driver, 40).until(EC.invisibility_of_element_located((By.XPATH, '/html/body/div[4]')))
         time.sleep(1)
         if driver.find_elements(By.XPATH, "/html/body/main/section/section/div[2]/div/div/div/section[1]/ul/li[1]"):
+            while 42:
+                try:
+                    WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/section/section/div[2]/div/div/div/section[1]/header/button')))
+                except StaleElementReferenceException:
+                    print("Stale Exception")
+                    continue
+                break
             element = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/section/section/div[2]/div/div/div/section[1]/header/button')))
             element.click()
         WebDriverWait(driver, 40).until(EC.invisibility_of_element_located((By.XPATH, '/html/body/div[4]')))
